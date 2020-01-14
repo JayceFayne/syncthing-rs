@@ -1,0 +1,29 @@
+[package]
+name = "syncthing"
+version = "0.1.0"
+authors = ["Jayce Fayne <jayce.fayne@mailbox.org>"]
+edition = "2018"
+license = "MIT"
+repository = "https://github.com/jaycefayne/syncthing-rs"
+categories = ["asynchronous", "concurrency", "network-programming"]
+keywords = ["syncthing", "rest", "http", "async"]
+readme = "README.md"
+
+[dependencies]
+url = "2.1.1"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+futures-core = "0.3.1"
+futures-util = "0.3.1"
+surf = { git  = "https://github.com/http-rs/surf" }
+http = "0.1.21" #match's surf's version of http
+serde_json =  { version = "1.0.44", features = ["raw_value"] }
+http-client = { version = "1.1.1", features = ["native_client"] }
+anyhow = "1.0"
+
+[dev-dependencies]
+async-std = "1.4.0"
+
+[[example]]
+name = "event_printer"
+path = "examples/event_printer/src/main.rs"
