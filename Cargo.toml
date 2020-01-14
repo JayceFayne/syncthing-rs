@@ -3,6 +3,7 @@ name = "syncthing"
 version = "0.1.0"
 authors = ["Jayce Fayne <jayce.fayne@mailbox.org>"]
 edition = "2018"
+description = "A Rust library for controlling syncthing file synchronization through its REST interface"
 license = "MIT"
 repository = "https://github.com/jaycefayne/syncthing-rs"
 categories = ["asynchronous", "concurrency", "network-programming"]
