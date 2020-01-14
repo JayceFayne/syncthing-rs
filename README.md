@@ -1,7 +1,7 @@
 # syncthing-rs
 
-A Rust library for controlling syncthing file synchronization through its [REST interface](https://github.com/syncthing/syncthing/blob/master/man/syncthing-rest-api.7).
-**Not all REST events are implemented yet. The crate API is subject to change.**
+A Rust library for controlling syncthing file synchronization through its [REST interface](https://github.com/syncthing/syncthing/blob/master/man/syncthing-rest-api.7).Note that not all REST events are implemented yet. The crate API is subject to change.
+**The crate on crates.io does not provide any functionality until there is a new release of surf. Consider using the git version.**
 
 ## Usage
 

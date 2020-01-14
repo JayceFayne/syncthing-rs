@@ -1,5 +1,6 @@
+use crate::reply::*;
 use crate::routes::Routes;
-use crate::*;
+use crate::{EventStream, EventType, Fallible, API_HEADER_KEY, API_URL};
 use anyhow::format_err;
 use http::Method;
 use http_client::HttpClient;
