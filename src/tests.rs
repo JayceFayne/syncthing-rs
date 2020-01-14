@@ -1,63 +1,61 @@
-use crate::*;
-use async_std::task::block_on;
+use crate::{Connection, Fallible};
 use futures_util::stream::StreamExt;
 use http_client::native::NativeClient;
 
 static KEY: &str = include_str!("../api.key");
 
 #[test]
-fn connect() -> Result<(), Error> {
+fn connect() -> Fallible<()> {
     Connection::new(NativeClient::new(), KEY)?;
     Ok(())
 }
-#[test]
-fn run_get_system_log() -> Result<(), Error> {
+
+#[async_std::test]
+async fn run_get_system_log() -> Fallible<()> {
     let connection = Connection::new(NativeClient::new(), KEY)?;
-    block_on(connection.get_system_log())?;
+    connection.get_system_log().await?;
     Ok(())
 }
 
-#[test]
-fn run_get_system_ping() -> Result<(), Error> {
+#[async_std::test]
+async fn run_get_system_ping() -> Fallible<()> {
     let connection = Connection::new(NativeClient::new(), KEY)?;
-    block_on(connection.get_system_ping())?;
+    connection.get_system_ping().await?;
     Ok(())
 }
 
-#[test]
-fn run_get_system_version() -> Result<(), Error> {
+#[async_std::test]
+async fn run_get_system_version() -> Fallible<()> {
     let connection = Connection::new(NativeClient::new(), KEY)?;
-    block_on(connection.get_system_version())?;
+    connection.get_system_version().await?;
     Ok(())
 }
 
-#[test]
-fn run_get_events() -> Result<(), Error> {
+#[async_std::test]
+async fn run_get_events() -> Fallible<()> {
     let connection = Connection::new(NativeClient::new(), KEY)?;
-    block_on(connection.get_events(None, None, None))?;
+    connection.get_events(None, None, None).await?;
     Ok(())
 }
 
-#[test]
-fn event_stream() -> Result<(), Error> {
+#[async_std::test]
+async fn event_stream() -> Fallible<()> {
     let connection = Connection::new(NativeClient::new(), KEY)?;
     let mut stream = connection.subscribe(None);
-    block_on(async {
-        let mut last = 0;
-        let mut i = 0;
-        while let Some(event) = stream.next().await {
-            if i > 3 {
-                return Ok(());
-            }
-            let event = event?;
-            if last == 0 {
-                last = event.id;
-            } else {
-                i += 1;
-                assert_eq!(last + 1, event.id);
-                last = event.id;
-            }
+    let mut last = 0;
+    let mut i = 0;
+    while let Some(event) = stream.next().await {
+        if i > 3 {
+            return Ok(());
         }
-        Ok(())
-    })
+        let event = event?;
+        if last == 0 {
+            last = event.id;
+        } else {
+            i += 1;
+            assert_eq!(last + 1, event.id);
+            last = event.id;
+        }
+    }
+    Ok(())
 }
