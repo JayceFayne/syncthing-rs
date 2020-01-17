@@ -83,7 +83,7 @@ pub enum EventData {
     FolderErrors(FolderErrorsEvent),
     FolderRejected(FolderRejectedEvent),
     FolderScanProgress(FolderScanProgressEvent),
-    FolderSummary(FolderSummaryEvent),
+    FolderSummary(Box<FolderSummaryEvent>),
     ItemFinished(ItemFinishedEvent),
     ItemStarted(ItemStartedEvent),
     ListenAddressesChanged(ListenAddressesChangedEvent),
