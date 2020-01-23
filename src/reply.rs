@@ -24,11 +24,16 @@ pub struct SystemPing {
 
 #[derive(Debug, Deserialize)]
 pub struct SystemLog {
-    pub messages: Vec<SystemLogEntry>,
+    pub messages: Vec<SystemEntry>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct SystemLogEntry {
+pub struct SystemError {
+    pub errors: Vec<SystemEntry>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SystemEntry {
     pub when: String,
     pub message: String,
 }

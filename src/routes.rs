@@ -4,6 +4,7 @@ use url::{ParseError, Url};
 pub(crate) struct Routes {
     pub events: Url,
     pub system_log: Url,
+    pub system_error: Url,
     pub system_ping: Url,
     pub system_version: Url,
 }
@@ -14,6 +15,7 @@ impl Routes {
         Ok(Self {
             events: base_url.join("events")?,
             system_log: base_url.join("system/log")?,
+            system_error: base_url.join("system/error")?,
             system_ping: base_url.join("system/ping")?,
             system_version: base_url.join("system/version")?,
         })

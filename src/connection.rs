@@ -91,6 +91,11 @@ impl<C: HttpClient> Connection<C> {
             .await
     }
 
+    pub async fn get_system_errors(&self) -> Fallible<SystemError> {
+        self.request(Method::GET, self.routes.system_error.clone())
+            .await
+    }
+
     pub async fn get_system_ping(&self) -> Fallible<SystemPing> {
         self.request(Method::GET, self.routes.system_ping.clone())
             .await
