@@ -1,23 +1,5 @@
-use url::{ParseError, Url};
-
-#[derive(Clone)]
-pub(crate) struct Routes {
-    pub events: Url,
-    pub system_log: Url,
-    pub system_error: Url,
-    pub system_ping: Url,
-    pub system_version: Url,
-}
-
-impl Routes {
-    pub fn new_with_base_url(base_url: impl AsRef<str>) -> Result<Self, ParseError> {
-        let base_url = Url::parse(base_url.as_ref())?.join("rest/")?;
-        Ok(Self {
-            events: base_url.join("events")?,
-            system_log: base_url.join("system/log")?,
-            system_error: base_url.join("system/error")?,
-            system_ping: base_url.join("system/ping")?,
-            system_version: base_url.join("system/version")?,
-        })
-    }
-}
+pub static EVENTS_PATH: &str = "/rest/events";
+pub static SYSTEM_LOG_PATH: &str = "/rest/system/log";
+pub static SYSTEM_ERROR_PATH: &str = "/rest/system/error";
+pub static SYSTEM_PING_PATH: &str = "/rest/system/ping";
+pub static SYSTEM_VERSION_PATH: &str = "/rest/system/version";

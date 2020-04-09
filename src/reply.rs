@@ -1,4 +1,6 @@
-use serde_derive::{Deserialize, Serialize};
+mod event;
+
+use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::collections::HashMap;
 
@@ -369,7 +371,7 @@ pub struct StateChangedEvent {
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct RawEvent {
+pub(super) struct RawEvent {
     pub id: u64,
     #[serde(rename = "globalID")]
     pub global_id: u64,
@@ -379,7 +381,8 @@ pub(crate) struct RawEvent {
     pub data: Box<RawValue>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
+#[serde(try_from = "RawEvent")]
 pub struct Event {
     pub id: u64,
     pub global_id: u64,
