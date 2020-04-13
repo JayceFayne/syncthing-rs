@@ -1,122 +1,8 @@
-mod event;
-
+use crate::rest::DeviceID;
+use crate::rest::{FileName, Folder, FolderName};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::collections::HashMap;
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
-pub struct SystemVersion {
-    pub arch: String, //FIXME:use enum
-    pub long_version: String,
-    pub os: String, //FIXME:use enum
-    pub version: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all(deserialize = "lowercase"))]
-pub enum Pong {
-    Pong,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SystemPing {
-    pub ping: Pong,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SystemLog {
-    pub messages: Vec<SystemEntry>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SystemError {
-    pub errors: Vec<SystemEntry>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SystemEntry {
-    pub when: String,
-    pub message: String,
-}
-
-//TODO: ip type for address, DeviceID/FolderID type with deser
-//FIXME: check folder == folderLable inconsistency
-
-#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
-pub enum EventType {
-    ConfigSaved,
-    DeviceConnected,
-    DeviceDisconnected,
-    DeviceDiscovered,
-    DevicePaused,
-    DeviceRejected,
-    DeviceResumed,
-    DownloadProgress,
-    FolderCompletion,
-    FolderErrors,
-    FolderRejected,
-    FolderScanProgress,
-    FolderSummary,
-    ItemFinished,
-    ItemStarted,
-    ListenAddressesChanged,
-    LocalChangeDetected,
-    LocalIndexUpdated,
-    LoginAttempt,
-    RemoteChangeDetected,
-    RemoteDownloadProgress,
-    RemoteIndexUpdated,
-    Starting,
-    StartupComplete,
-    StateChanged,
-}
-
-type FileName = String;
-type FolderName = String;
-type Folder = HashMap<FileName, File>;
-
-#[derive(Debug, Deserialize)]
-pub enum EventData {
-    ConfigSaved(ConfigSavedEvent),
-    DeviceConnected(DeviceConnectedEvent),
-    DeviceDisconnected(DeviceDisconnectedEvent),
-    DeviceDiscovered(DeviceDiscoveredEvent),
-    DevicePaused(DevicePausedEvent),
-    DeviceRejected(DeviceRejectedEvent),
-    DeviceResumed(DeviceResumedEvent),
-    DownloadProgress(HashMap<FolderName, Folder>),
-    FolderCompletion(FolderCompletionEvent),
-    FolderErrors(FolderErrorsEvent),
-    FolderRejected(FolderRejectedEvent),
-    FolderScanProgress(FolderScanProgressEvent),
-    FolderSummary(Box<FolderSummaryEvent>),
-    ItemFinished(ItemFinishedEvent),
-    ItemStarted(ItemStartedEvent),
-    ListenAddressesChanged(ListenAddressesChangedEvent),
-    LocalChangeDetected(LocalChangeDetectedEvent),
-    LocalIndexUpdated(LocalIndexUpdatedEvent),
-    LoginAttempt(LoginAttemptEvent),
-    RemoteChangeDetected(RemoteChangeDetectedEvent),
-    RemoteDownloadProgress(RemoteDownloadProgressEvent),
-    RemoteIndexUpdated(RemoteIndexUpdatedEvent),
-    Starting(StartingEvent),
-    StartupComplete,
-    StateChanged(StateChangedEvent),
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
-pub struct File {
-    pub total: u64,
-    pub pulling: u64,
-    pub copied_from_origin: u64,
-    pub reused: u64,
-    pub copied_from_elsewhere: u64,
-    pub pulled: u64,
-    pub bytes_total: u64,
-    pub bytes_done: u64,
-}
 
 //FIXME: complete
 #[derive(Debug, Deserialize)]
@@ -130,7 +16,7 @@ pub struct ConfigSavedEvent {
 pub struct DeviceConnectedEvent {
     pub addr: String,
     #[serde(rename = "id")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     pub device_name: String,
     pub client_name: String,
     pub client_version: String,
@@ -141,27 +27,27 @@ pub struct DeviceConnectedEvent {
 #[derive(Debug, Deserialize)]
 pub struct DeviceDisconnectedEvent {
     #[serde(rename = "id")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     pub error: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct DeviceDiscoveredEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     pub addrs: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct DevicePausedEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct DeviceRejectedEvent {
     #[serde(rename = "device")]
-    device_id: String,
+    pub device_id: DeviceID,
     pub name: String,
     pub address: String,
 }
@@ -169,14 +55,14 @@ pub struct DeviceRejectedEvent {
 #[derive(Debug, Deserialize)]
 pub struct DeviceResumedEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct FolderCompletionEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     #[serde(rename = "folder")]
     pub folder_id: String,
     pub completion: f64,
@@ -201,7 +87,7 @@ pub struct FolderError {
 #[derive(Debug, Deserialize)]
 pub struct FolderRejectedEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     #[serde(rename = "folder")]
     pub folder_id: String,
     #[serde(rename = "folderLabel")]
@@ -326,7 +212,7 @@ pub struct RemoteChangeDetectedEvent {
 #[derive(Debug, Deserialize)]
 pub struct RemoteDownloadProgressEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     pub folder: String,
     pub state: HashMap<FileName, u64>,
 }
@@ -334,7 +220,7 @@ pub struct RemoteDownloadProgressEvent {
 #[derive(Debug, Deserialize)]
 pub struct RemoteIndexUpdatedEvent {
     #[serde(rename = "device")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     #[serde(rename = "folder")]
     pub folder_id: String,
     pub items: u64,
@@ -344,7 +230,7 @@ pub struct RemoteIndexUpdatedEvent {
 #[derive(Debug, Deserialize)]
 pub struct StartingEvent {
     #[serde(rename = "myID")]
-    pub device_id: String,
+    pub device_id: DeviceID,
     pub home: String,
 }
 
@@ -371,6 +257,35 @@ pub struct StateChangedEvent {
 }
 
 #[derive(Debug, Deserialize)]
+pub enum EventData {
+    ConfigSaved(ConfigSavedEvent),
+    DeviceConnected(DeviceConnectedEvent),
+    DeviceDisconnected(DeviceDisconnectedEvent),
+    DeviceDiscovered(DeviceDiscoveredEvent),
+    DevicePaused(DevicePausedEvent),
+    DeviceRejected(DeviceRejectedEvent),
+    DeviceResumed(DeviceResumedEvent),
+    DownloadProgress(HashMap<FolderName, Folder>),
+    FolderCompletion(FolderCompletionEvent),
+    FolderErrors(FolderErrorsEvent),
+    FolderRejected(FolderRejectedEvent),
+    FolderScanProgress(FolderScanProgressEvent),
+    FolderSummary(Box<FolderSummaryEvent>),
+    ItemFinished(ItemFinishedEvent),
+    ItemStarted(ItemStartedEvent),
+    ListenAddressesChanged(ListenAddressesChangedEvent),
+    LocalChangeDetected(LocalChangeDetectedEvent),
+    LocalIndexUpdated(LocalIndexUpdatedEvent),
+    LoginAttempt(LoginAttemptEvent),
+    RemoteChangeDetected(RemoteChangeDetectedEvent),
+    RemoteDownloadProgress(RemoteDownloadProgressEvent),
+    RemoteIndexUpdated(RemoteIndexUpdatedEvent),
+    Starting(StartingEvent),
+    StartupComplete,
+    StateChanged(StateChangedEvent),
+}
+
+#[derive(Debug, Deserialize)]
 pub(super) struct RawEvent {
     pub id: u64,
     #[serde(rename = "globalID")]
@@ -381,6 +296,35 @@ pub(super) struct RawEvent {
     pub data: Box<RawValue>,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
+pub enum EventType {
+    ConfigSaved,
+    DeviceConnected,
+    DeviceDisconnected,
+    DeviceDiscovered,
+    DevicePaused,
+    DeviceRejected,
+    DeviceResumed,
+    DownloadProgress,
+    FolderCompletion,
+    FolderErrors,
+    FolderRejected,
+    FolderScanProgress,
+    FolderSummary,
+    ItemFinished,
+    ItemStarted,
+    ListenAddressesChanged,
+    LocalChangeDetected,
+    LocalIndexUpdated,
+    LoginAttempt,
+    RemoteChangeDetected,
+    RemoteDownloadProgress,
+    RemoteIndexUpdated,
+    Starting,
+    StartupComplete,
+    StateChanged,
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(try_from = "RawEvent")]
 pub struct Event {
@@ -388,4 +332,58 @@ pub struct Event {
     pub global_id: u64,
     pub time: String,
     pub data: EventData,
+}
+
+impl core::convert::TryFrom<RawEvent> for Event {
+    type Error = serde_json::Error;
+
+    fn try_from(raw_event: RawEvent) -> Result<Self, Self::Error> {
+        use EventData::*;
+        let RawEvent {
+            id,
+            global_id,
+            event_type,
+            time,
+            data,
+        } = raw_event;
+        let data = data.get();
+        Ok(Event {
+            id,
+            global_id,
+            time,
+            data: match event_type {
+                EventType::ConfigSaved => ConfigSaved(serde_json::from_str(data)?),
+                EventType::DeviceConnected => DeviceConnected(serde_json::from_str(data)?),
+                EventType::DeviceDisconnected => DeviceDisconnected(serde_json::from_str(data)?),
+                EventType::DeviceDiscovered => DeviceDiscovered(serde_json::from_str(data)?),
+                EventType::DevicePaused => DevicePaused(serde_json::from_str(data)?),
+                EventType::DeviceRejected => DeviceRejected(serde_json::from_str(data)?),
+                EventType::DeviceResumed => DeviceResumed(serde_json::from_str(data)?),
+                EventType::DownloadProgress => DownloadProgress(serde_json::from_str(data)?),
+                EventType::FolderCompletion => FolderCompletion(serde_json::from_str(data)?),
+                EventType::FolderErrors => FolderErrors(serde_json::from_str(data)?),
+                EventType::FolderRejected => FolderRejected(serde_json::from_str(data)?),
+                EventType::FolderScanProgress => FolderScanProgress(serde_json::from_str(data)?),
+                EventType::FolderSummary => FolderSummary(serde_json::from_str(data)?),
+                EventType::ItemFinished => ItemFinished(serde_json::from_str(data)?),
+                EventType::ItemStarted => ItemStarted(serde_json::from_str(data)?),
+                EventType::ListenAddressesChanged => {
+                    ListenAddressesChanged(serde_json::from_str(data)?)
+                }
+                EventType::LocalChangeDetected => LocalChangeDetected(serde_json::from_str(data)?),
+                EventType::LocalIndexUpdated => LocalIndexUpdated(serde_json::from_str(data)?),
+                EventType::LoginAttempt => LoginAttempt(serde_json::from_str(data)?),
+                EventType::RemoteChangeDetected => {
+                    RemoteChangeDetected(serde_json::from_str(data)?)
+                }
+                EventType::RemoteDownloadProgress => {
+                    RemoteDownloadProgress(serde_json::from_str(data)?)
+                }
+                EventType::RemoteIndexUpdated => RemoteIndexUpdated(serde_json::from_str(data)?),
+                EventType::Starting => Starting(serde_json::from_str(data)?),
+                EventType::StartupComplete => StartupComplete,
+                EventType::StateChanged => StateChanged(serde_json::from_str(data)?),
+            },
+        })
+    }
 }

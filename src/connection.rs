@@ -1,9 +1,12 @@
 use crate::event_stream::EventStream;
-use crate::reply::*;
+use crate::rest::events::{Event, EventType};
+use crate::rest::system;
 use crate::routes::*;
-use crate::{EventType, Fallible};
+use crate::utils::QueryChars;
+use crate::Fallible;
 use anyhow::bail;
 use bytes::buf::BufExt as _;
+use bytes::Buf;
 use http::header::HeaderValue;
 use http::request::Request;
 use http::uri::{Authority, Parts as UriParts, PathAndQuery, Scheme, Uri};
@@ -76,10 +79,14 @@ impl Connection {
             .insert(API_HEADER_KEY, HeaderValue::from_str(&self.api_key)?);
         let resp = self.client.request(request).await?;
         let status_code = resp.status().as_u16();
+        let body = hyper::body::aggregate(resp).await?;
         if status_code < 200 || status_code > 299 {
-            bail!("got http status code '{}'", status_code)
+            bail!(
+                "got http status code '{}' with following msg:\n {}",
+                status_code,
+                String::from_utf8_lossy(body.bytes())
+            )
         } else {
-            let body = hyper::body::aggregate(resp).await?;
             Ok(serde_json::from_reader(body.reader())?)
         }
     }
@@ -101,6 +108,7 @@ impl Connection {
     ) -> Fallible<Vec<Event>> {
         let mut path_and_query = EVENTS_PATH.to_owned();
         let events = events.as_ref();
+        let mut query_chars = QueryChars::new();
         if !events.is_empty() {
             let events = serde_json::to_string(&events)?
                 .chars()
@@ -111,15 +119,18 @@ impl Connection {
                     _ => true,
                 })
                 .collect::<String>();
-            path_and_query.push_str("&events=");
+            path_and_query.push(query_chars.next_char());
+            path_and_query.push_str("events=");
             path_and_query.push_str(events.as_ref());
         }
         if let Some(since) = since {
-            path_and_query.push_str("&since=");
+            path_and_query.push(query_chars.next_char());
+            path_and_query.push_str("since=");
             path_and_query.push_str(since.to_string().as_ref());
         }
         if let Some(limit) = limit {
-            path_and_query.push_str("&limit=");
+            path_and_query.push(query_chars.next_char());
+            path_and_query.push_str("limit=");
             path_and_query.push_str(limit.to_string().as_ref());
         }
         self.request(Method::GET, path_and_query).await
@@ -133,19 +144,35 @@ impl Connection {
         EventStream::new(self, EMPTY_EVENT_SUBSCRIPTION.clone())
     }
 
-    pub async fn get_system_log(&self) -> Fallible<SystemLog> {
+    pub async fn get_system_connections(&self) -> Fallible<system::connections::Connections> {
+        self.request(Method::GET, SYSTEM_CONNECTIONS_PATH).await
+    }
+
+    pub async fn get_system_debug(&self) -> Fallible<system::debug::DebugInfo> {
+        self.request(Method::GET, SYSTEM_DEBUG_PATH).await
+    }
+
+    pub async fn get_system_discovery(&self) -> Fallible<system::discovery::Discovery> {
+        self.request(Method::GET, SYSTEM_DISCOVERY_PATH).await
+    }
+
+    pub async fn get_system_log(&self) -> Fallible<system::log::Log> {
         self.request(Method::GET, SYSTEM_LOG_PATH).await
     }
 
-    pub async fn get_system_errors(&self) -> Fallible<SystemError> {
+    pub async fn get_system_errors(&self) -> Fallible<system::error::Error> {
         self.request(Method::GET, SYSTEM_ERROR_PATH).await
     }
 
-    pub async fn get_system_ping(&self) -> Fallible<SystemPing> {
+    pub async fn get_system_ping(&self) -> Fallible<system::ping::Ping> {
         self.request(Method::GET, SYSTEM_PING_PATH).await
     }
 
-    pub async fn get_system_version(&self) -> Fallible<SystemVersion> {
+    pub async fn get_system_upgrade(&self) -> Fallible<system::upgrade::UpgradeInfo> {
+        self.request(Method::GET, SYSTEM_UPGRADE_PATH).await
+    }
+
+    pub async fn get_system_version(&self) -> Fallible<system::version::Version> {
         self.request(Method::GET, SYSTEM_VERSION_PATH).await
     }
 }

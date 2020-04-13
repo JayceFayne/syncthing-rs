@@ -1,4 +1,5 @@
-use crate::{Connection, Event, EventType, Fallible};
+use crate::rest::events::{Event, EventType};
+use crate::{Connection, Fallible};
 use futures_core::future::BoxFuture;
 use futures_core::ready;
 use futures_core::stream::Stream;

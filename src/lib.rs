@@ -1,12 +1,14 @@
 mod connection;
 mod event_stream;
-mod reply;
+pub mod rest;
 mod routes;
 #[cfg(test)]
 mod tests;
+mod utils;
 
 pub use connection::Connection;
 pub use event_stream::*;
-pub use reply::*;
+
+//TODO: add log + feature flag
 
 pub type Fallible<T> = Result<T, anyhow::Error>;

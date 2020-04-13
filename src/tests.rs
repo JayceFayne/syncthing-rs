@@ -4,28 +4,57 @@ use futures_util::stream::StreamExt;
 static API_KEY: &str = include_str!("../api.key");
 
 #[tokio::test]
-async fn run_get_system_log() -> Fallible<()> {
+async fn get_system_connections() -> Fallible<()> {
+    let connection = Connection::new(API_KEY);
+    connection.get_system_connections().await?;
+    Ok(())
+}
+
+#[tokio::test]
+async fn get_system_debug() -> Fallible<()> {
+    let connection = Connection::new(API_KEY);
+    connection.get_system_debug().await?;
+    Ok(())
+}
+
+#[tokio::test]
+async fn get_system_discovery() -> Fallible<()> {
+    let connection = Connection::new(API_KEY);
+    connection.get_system_discovery().await?;
+    Ok(())
+}
+
+#[tokio::test]
+async fn get_system_log() -> Fallible<()> {
     let connection = Connection::new(API_KEY);
     connection.get_system_log().await?;
     Ok(())
 }
 
 #[tokio::test]
-async fn run_get_system_ping() -> Fallible<()> {
+async fn get_system_ping() -> Fallible<()> {
     let connection = Connection::new(API_KEY);
     connection.get_system_ping().await?;
     Ok(())
 }
 
 #[tokio::test]
-async fn run_get_system_version() -> Fallible<()> {
+#[ignore]
+async fn get_system_upgrade() -> Fallible<()> {
+    let connection = Connection::new(API_KEY);
+    connection.get_system_upgrade().await?;
+    Ok(())
+}
+
+#[tokio::test]
+async fn get_system_version() -> Fallible<()> {
     let connection = Connection::new(API_KEY);
     connection.get_system_version().await?;
     Ok(())
 }
 
 #[tokio::test]
-async fn run_get_events() -> Fallible<()> {
+async fn get_events() -> Fallible<()> {
     let connection = Connection::new(API_KEY);
     connection.get_all_events(None, None).await?;
     Ok(())
