@@ -1,4 +1,11 @@
-# syncthing-rs
+# syncthing &emsp; [![Action Badge]][actions] [![Version Badge]][crates.io] [![License Badge]][license]
+
+[Version Badge]: https://img.shields.io/crates/v/syncthing.svg
+[crates.io]: https://crates.io/crates/syncthing
+[Action Badge]: https://github.com/JayceFayne/syncthing-rs/workflows/Rust/badge.svg
+[actions]: https://github.com/JayceFayne/syncthing-rs/actions
+[License Badge]: https://img.shields.io/crates/l/syncthing.svg
+[license]: https://github.com/JayceFayne/syncthing-rs/blob/master/LICENSE.md
 
 A Rust library for controlling syncthing file synchronization through its [REST interface](https://github.com/syncthing/syncthing/blob/master/man/syncthing-rest-api.7). Note that not all REST endpoints are implemented yet. The crate API is subject to change.
 
