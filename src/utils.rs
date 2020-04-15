@@ -14,3 +14,15 @@ impl QueryChars {
         }
     }
 }
+
+use serde::{Deserialize, Deserializer};
+
+pub fn default_on_null<'de, D, T: Default + Deserialize<'de>>(
+    deserializer: D,
+) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.unwrap_or_default())
+}

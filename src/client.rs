@@ -163,7 +163,7 @@ impl Client {
         self.request(Method::GET, SYSTEM_LOG_PATH).await
     }
 
-    pub async fn get_system_errors(&self) -> Fallible<system::error::Error> {
+    pub async fn get_system_error(&self) -> Fallible<system::error::Error> {
         self.request(Method::GET, SYSTEM_ERROR_PATH).await
     }
 

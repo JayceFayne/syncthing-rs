@@ -39,6 +39,13 @@ async fn get_system_ping() -> Fallible<()> {
 }
 
 #[tokio::test]
+async fn get_system_error() -> Fallible<()> {
+    let client = Client::new(API_KEY);
+    client.get_system_error().await?;
+    Ok(())
+}
+
+#[tokio::test]
 #[ignore]
 async fn get_system_upgrade() -> Fallible<()> {
     let client = Client::new(API_KEY);
