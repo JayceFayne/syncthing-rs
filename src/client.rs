@@ -11,29 +11,32 @@ use http::header::HeaderValue;
 use http::request::Request;
 use http::uri::{Authority, Parts as UriParts, PathAndQuery, Scheme, Uri};
 use hyper::client::HttpConnector;
-use hyper::{Client, Method};
+use hyper::{Client as HyperClient, Method};
 use serde::de::DeserializeOwned as Deserialize;
 
 static API_HEADER_KEY: &str = "X-API-Key";
 static API_DEFAULT_AUTHORITY: &str = "127.0.0.1:8384";
 static EMPTY_EVENT_SUBSCRIPTION: Vec<EventType> = Vec::new();
 
-pub struct Connection {
-    client: Client<HttpConnector>,
+pub struct Client {
+    client: HyperClient<HttpConnector>,
     authority: Authority,
     api_key: String,
 }
 
-impl Connection {
+impl Client {
     pub fn new(api_key: impl Into<String>) -> Self {
         Self {
-            client: Client::new(),
+            client: HyperClient::new(),
             api_key: api_key.into(),
             authority: Authority::from_static(API_DEFAULT_AUTHORITY),
         }
     }
 
-    pub fn new_with_client(client: Client<HttpConnector>, api_key: impl Into<String>) -> Self {
+    pub fn new_with_hyper_client(
+        client: HyperClient<HttpConnector>,
+        api_key: impl Into<String>,
+    ) -> Self {
         Self {
             client,
             api_key: api_key.into(),
@@ -43,14 +46,14 @@ impl Connection {
 
     pub fn new_with_authority(api_key: impl Into<String>, authority: Authority) -> Self {
         Self {
-            client: Client::new(),
+            client: HyperClient::new(),
             api_key: api_key.into(),
             authority,
         }
     }
 
-    pub fn new_with_client_and_authority(
-        client: Client<HttpConnector>,
+    pub fn new_with_hyper_client_and_authority(
+        client: HyperClient<HttpConnector>,
         api_key: impl Into<String>,
         authority: Authority,
     ) -> Self {

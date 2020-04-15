@@ -1,69 +1,69 @@
-use crate::{Connection, Fallible};
+use crate::{Client, Fallible};
 use futures_util::stream::StreamExt;
 
 static API_KEY: &str = include_str!("../api.key");
 
 #[tokio::test]
 async fn get_system_connections() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_connections().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_connections().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_system_debug() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_debug().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_debug().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_system_discovery() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_discovery().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_discovery().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_system_log() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_log().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_log().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_system_ping() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_ping().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_ping().await?;
     Ok(())
 }
 
 #[tokio::test]
 #[ignore]
 async fn get_system_upgrade() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_upgrade().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_upgrade().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_system_version() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_system_version().await?;
+    let client = Client::new(API_KEY);
+    client.get_system_version().await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn get_events() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    connection.get_all_events(None, None).await?;
+    let client = Client::new(API_KEY);
+    client.get_all_events(None, None).await?;
     Ok(())
 }
 
 #[tokio::test]
 async fn event_stream() -> Fallible<()> {
-    let connection = Connection::new(API_KEY);
-    let mut stream = connection.subscribe_to_all();
+    let client = Client::new(API_KEY);
+    let mut stream = client.subscribe_to_all();
     let mut last = 0;
     let mut i = 0;
     while let Some(event) = stream.next().await {

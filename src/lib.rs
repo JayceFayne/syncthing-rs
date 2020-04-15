@@ -1,4 +1,4 @@
-mod connection;
+mod client;
 mod event_stream;
 pub mod rest;
 mod routes;
@@ -6,7 +6,7 @@ mod routes;
 mod tests;
 mod utils;
 
-pub use connection::Connection;
+pub use client::Client;
 pub use event_stream::*;
 
 //TODO: add log + feature flag
