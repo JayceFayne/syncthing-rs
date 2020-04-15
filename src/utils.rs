@@ -6,12 +6,11 @@ impl QueryChars {
     }
 
     pub fn next_char(&mut self) -> char {
-        match self.0 {
-            true => '&',
-            false => {
-                self.0 = true;
-                '?'
-            }
+        if self.0 {
+            '&'
+        } else {
+            self.0 = true;
+            '?'
         }
     }
 }
