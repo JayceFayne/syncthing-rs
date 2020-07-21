@@ -75,8 +75,8 @@ impl Client {
         uri_parts.path_and_query = Some(PathAndQuery::from_maybe_shared(path_and_query)?);
         let uri = Uri::from_parts(uri_parts)?;
         let mut request = Request::new(Default::default());
-        std::mem::replace(request.uri_mut(), uri);
-        std::mem::replace(request.method_mut(), method);
+        *request.uri_mut() = uri;
+        *request.method_mut() = method;
         request
             .headers_mut()
             .insert(API_HEADER_KEY, HeaderValue::from_str(&self.api_key)?);
