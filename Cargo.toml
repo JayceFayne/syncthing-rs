@@ -1,6 +1,6 @@
 [package]
 name = "syncthing"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Jayce Fayne <jayce.fayne@mailbox.org>"]
 edition = "2018"
 description = "A Rust library for controlling syncthing file synchronization through its REST interface"
