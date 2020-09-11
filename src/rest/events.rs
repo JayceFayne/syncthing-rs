@@ -287,15 +287,14 @@ pub enum EventData {
 }
 
 #[derive(Debug, Deserialize)]
-pub(super) struct RawEvent<'a> {
+pub(super) struct RawEvent {
     pub id: u64,
     #[serde(rename = "globalID")]
     pub global_id: u64,
     #[serde(rename = "type")]
     pub event_type: EventType,
     pub time: String,
-    #[serde(borrow)]
-    pub data: &'a RawValue,
+    pub data: Box<RawValue>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
@@ -336,7 +335,7 @@ pub struct Event {
     pub data: EventData,
 }
 
-impl core::convert::TryFrom<RawEvent<'_>> for Event {
+impl core::convert::TryFrom<RawEvent> for Event {
     type Error = serde_json::Error;
 
     fn try_from(raw_event: RawEvent) -> Result<Self, Self::Error> {
