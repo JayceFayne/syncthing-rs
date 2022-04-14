@@ -1,12 +1,8 @@
-use super::FolderId;
+use super::{FolderId, Kibibytes, KibibytesPerSecond, PortNumber};
 use ipnet::IpNet;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use url::Url;
-
-pub type Kibibytes = u64;
-pub type KibibytesPerSecond = u64;
-pub type PortNumber = u16;
 
 /// <https://docs.syncthing.net/users/config.html#device-element>
 #[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
@@ -15,13 +11,13 @@ pub struct Device {
     #[serde(rename = "deviceID")]
     id: String,
     #[serde(flatten)]
-    parameters: Parameters,
+    options: Options,
 }
 
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize, Default)]
 #[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
-pub struct Parameters {
+pub struct Options {
     name: Option<String>,
     compression: Option<Compression>,
     introducer: Option<bool>,
@@ -57,12 +53,11 @@ pub enum Compression {
 pub enum Address {
     #[serde(with = "strings::dynamic")]
     Dynamic,
-    Endpoint(Url),
+    Static(Url),
 }
 
 mod strings {
     use crate::utils::named_unit_variant;
-
     named_unit_variant!(dynamic);
 }
 
@@ -91,7 +86,7 @@ mod tests {
     #[case::quic4("quic4://fileserver")]
     #[case::quic6("quic6://fileserver")]
     fn address_roundtrip_testing(#[case] address_str: &str) {
-        let address = Address::Endpoint(Url::parse(address_str).unwrap());
+        let address = Address::Static(Url::parse(address_str).unwrap());
         let serialized = serialize(&address);
         assert_eq!(serialized, serialize(address_str));
         let deserialized = deserialize::<Address>(&serialized);

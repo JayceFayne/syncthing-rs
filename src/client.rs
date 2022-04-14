@@ -1,6 +1,6 @@
 use crate::event_stream::EventStream;
 use crate::rest::events::{Event, EventType};
-use crate::rest::system;
+use crate::rest::{config, system};
 use crate::routes::*;
 use crate::utils::QueryChars;
 use crate::Fallible;
@@ -83,7 +83,7 @@ impl Client {
         let resp = self.client.request(request).await?;
         let status_code = resp.status().as_u16();
         let body = hyper::body::aggregate(resp).await?;
-        if status_code < 200 || status_code > 299 {
+        if !(200..=299).contains(&status_code) {
             bail!(
                 "got http status code '{}' with following msg:\n {}",
                 status_code,
@@ -177,5 +177,15 @@ impl Client {
 
     pub async fn get_system_version(&self) -> Fallible<system::version::Version> {
         self.request(Method::GET, SYSTEM_VERSION_PATH).await
+    }
+
+    // /rest/config
+
+    pub async fn get_config_folders(&self) -> Fallible<Vec<config::folders::Folder>> {
+        self.request(Method::GET, CONFIG_FOLDERS_PATH).await
+    }
+
+    pub async fn get_config_devices(&self) -> Fallible<Vec<config::devices::Device>> {
+        self.request(Method::GET, CONFIG_DEVICES_PATH).await
     }
 }
