@@ -115,12 +115,7 @@ impl Client {
         if !events.is_empty() {
             let events = serde_json::to_string(&events)?
                 .chars()
-                .filter(|e| match e {
-                    '\"' => false,
-                    '[' => false,
-                    ']' => false,
-                    _ => true,
-                })
+                .filter(|e| !matches!(e, '\"' | '[' | ']'))
                 .collect::<String>();
             path_and_query.push(query_chars.next_char());
             path_and_query.push_str("events=");
