@@ -12,8 +12,8 @@ pub type TrafficClass = u8;
 /// The options element contains all other global configuration options.
 /// <https://docs.syncthing.net/users/config.html#options-element>
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Options {
     /// The listen address for incoming sync connections. See [`ListenAddress`] for the allowed
     /// syntax.
@@ -188,7 +188,7 @@ pub struct Options {
     insecure_allow_old_tls_versions: Option<bool>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum ListenAddress {
     #[serde(with = "strings::default")]
@@ -201,7 +201,7 @@ enum ListenAddress {
 /// may be added as query options to the URL: `insecure` to prevent certificate validation (required
 /// for HTTP URLs) and `id=<device ID>` to perform certificate pinning. The device ID to use is
 /// printed by the discovery server on startup.
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum AnnounceServer {
     #[serde(with = "strings::default")]
@@ -209,7 +209,7 @@ enum AnnounceServer {
     Address(Url),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum StunServer {
     #[serde(with = "strings::default")]
@@ -218,8 +218,8 @@ enum StunServer {
     Address(String),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "lowercase", serialize = "lowercase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 enum DatabaseTuning {
     Small,
     Large,

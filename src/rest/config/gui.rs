@@ -3,8 +3,8 @@ use std::{net::SocketAddr, path::PathBuf};
 
 /// The GUI configuration.
 /// <https://docs.syncthing.net/users/config.html#gui-element>
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Gui {
     /// If not `true`, the GUI and API will not be started.
     pub enabled: bool,
@@ -52,15 +52,15 @@ pub struct Gui {
     pub auth_mode: AuthMode,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Address {
     Ip(SocketAddr),
     UnixDomainSocket(PathBuf),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "lowercase", serialize = "lowercase"))]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum AuthMode {
     Static,
     Ldap,

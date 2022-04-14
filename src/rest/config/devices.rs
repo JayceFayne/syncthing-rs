@@ -5,8 +5,8 @@ use serde_with::skip_serializing_none;
 use url::Url;
 
 /// <https://docs.syncthing.net/users/config.html#device-element>
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Device {
     #[serde(rename = "deviceID")]
     id: String,
@@ -15,8 +15,8 @@ pub struct Device {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize, Default)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Options {
     name: Option<String>,
     compression: Option<Compression>,
@@ -40,15 +40,15 @@ pub struct Options {
     untrusted: Option<bool>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub enum Compression {
     Metadata,
     Always,
     Never,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Address {
     #[serde(with = "strings::dynamic")]

@@ -3,8 +3,8 @@ use serde_with::skip_serializing_none;
 
 /// LDAP configuration options. The mechanism is described in detail under LDAP Authentication.
 /// <https://docs.syncthing.net/users/config.html#ldap-element>
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Ldap {
     /// LDAP server address (`server:port`).
     // TODO: Is there a type for `server:port` representations?
@@ -18,8 +18,8 @@ pub struct Ldap {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Options {
     pub transport: Option<Transport>,
     /// Skip verification (`true` or `false`).
@@ -31,8 +31,8 @@ pub struct Options {
     pub search_filter: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "lowercase", serialize = "lowercase"))]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum Transport {
     /// Non secure connection.
     NonTls,

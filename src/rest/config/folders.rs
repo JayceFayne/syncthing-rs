@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 pub type CountWithInfinite = i64;
 
 /// <https://docs.syncthing.net/users/config.html#folder-element>
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Folder {
     /// The folder ID, which must be unique.
     pub id: FolderId,
@@ -34,8 +34,8 @@ impl Folder {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize, Default)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Options {
     /// The label of a folder is a human readable and descriptive local name. May be different on
     /// each device, empty, and/or identical to other folder labels. (optional)
@@ -184,15 +184,15 @@ pub struct Options {
 }
 
 /// https://docs.syncthing.net/advanced/folder-filesystem-type.html
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "lowercase", serialize = "lowercase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum FilesystemType {
     Basic,
     Fake,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "lowercase", serialize = "lowercase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum Type {
     /// The folder is in default mode. Sending local and accepting remote changes. Note that this
     /// type was previously called “readwrite” which is deprecated but still accepted in incoming
@@ -213,24 +213,20 @@ pub enum Type {
 
 // TODO: Where is the spec for this?
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Versioning {
     #[serde(rename = "type")]
     pub ty: Option<String>,
-    pub params: Option<VersioningParams>,
+    // TODO
+    pub params: Option<serde_json::Value>,
     pub cleanup_interval_s: Option<Seconds>,
     pub fs_path: Option<String>,
     pub fs_type: Option<FilesystemType>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-pub struct VersioningParams {
-    // TODO
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub enum PullOrder {
     /// Pull files in random order. This optimizes for balancing resources among the devices in a
     /// cluster.
@@ -251,8 +247,8 @@ impl Default for PullOrder {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "camelCase", serialize = "camelCase"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub enum BlockPullOrder {
     /// The blocks of a file are split into N equal continuous sequences, where N is the number of
     /// connected devices. Each device starts downloading its own sequence, after which it picks
@@ -273,8 +269,8 @@ impl Default for BlockPullOrder {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all(deserialize = "snake_case", serialize = "snake_case"))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 pub enum CopyRangeMethod {
     Standard,
     CopyFileRange,
