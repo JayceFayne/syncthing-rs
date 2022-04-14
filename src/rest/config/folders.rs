@@ -363,5 +363,5 @@ mod tests {
         "copyRangeMethod": "standard",
         "caseSensitiveFS": false,
         "junctionsAsDirs": false
-      } "#;
+    }"#;
 }

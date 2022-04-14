@@ -173,7 +173,7 @@ mod tests {
     }
 
     #[test]
-    fn json_normalization_roundtrip() {
+    fn normalization_roundtrip() {
         normalization_roundtrip_test::<Device>(DEFAULT_DEVICE);
     }
 
@@ -198,6 +198,5 @@ mod tests {
         "maxRequestKiB": 0,
         "untrusted": false,
         "remoteGUIPort": 0
-      }
-    "#;
+    }"#;
 }
