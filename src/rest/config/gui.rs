@@ -1,5 +1,13 @@
 use serde::{Deserialize, Serialize};
-use std::{net::SocketAddr, path::PathBuf};
+use std::{
+    fmt::{Display, Write},
+    net::SocketAddr,
+    num::ParseIntError,
+    path::PathBuf,
+    str::FromStr,
+};
+
+use super::PortNumber;
 
 /// The GUI configuration.
 /// <https://docs.syncthing.net/users/config.html#gui-element>
@@ -56,7 +64,71 @@ pub struct Gui {
 #[serde(untagged)]
 pub enum Address {
     Ip(SocketAddr),
-    UnixDomainSocket(PathBuf),
+    #[serde(with = "serde_with::rust::display_fromstr")]
+    Port(WildcardPort),
+    Path(PathBuf),
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+pub struct WildcardPort(PortNumber);
+
+impl WildcardPort {
+    pub fn new(port: PortNumber) -> Self {
+        Self(port)
+    }
+
+    pub fn port(self) -> PortNumber {
+        self.0
+    }
+}
+
+impl From<PortNumber> for WildcardPort {
+    fn from(port: PortNumber) -> Self {
+        Self::new(port)
+    }
+}
+
+impl From<WildcardPort> for PortNumber {
+    fn from(port: WildcardPort) -> Self {
+        port.port()
+    }
+}
+
+impl FromStr for WildcardPort {
+    type Err = ParseWildcardPortError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Some(port) = s.strip_prefix(':') {
+            port.parse::<PortNumber>()
+                .map(WildcardPort::new)
+                .map_err(ParseWildcardPortError::IntError)
+        } else {
+            Err(ParseWildcardPortError::MissingPrefix)
+        }
+    }
+}
+
+impl Display for WildcardPort {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_char(':')?;
+        self.port().fmt(f)
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum ParseWildcardPortError {
+    MissingPrefix,
+    IntError(ParseIntError),
+}
+
+impl Display for ParseWildcardPortError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use ParseWildcardPortError::*;
+        match self {
+            MissingPrefix => f.write_str("missing ':' prefix"),
+            IntError(int_error) => int_error.fmt(f),
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
@@ -64,4 +136,46 @@ pub enum Address {
 pub enum AuthMode {
     Static,
     Ldap,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rest::config::test_helper::{deserialize, serialize};
+    use rstest::rstest;
+    use serde_json::Value;
+
+    #[rstest]
+    #[case::ipv4("127.0.0.1:8384")]
+    #[case::ipv6("[::1]:8384")]
+    #[case::wildcard4("0.0.0.0:12345")]
+    #[case::wildcard6("[::]:12345")]
+    #[case::wildcard_port(":12345")]
+    #[case::unix_socket("/var/run/st.sock")]
+    fn types_of_addresses(#[case] address: &str) {
+        let serialized_str = serialize(Value::String(address.to_owned()));
+        let deserialized_address = deserialize::<Address>(&serialized_str);
+        println!("{:?}", deserialized_address);
+        let serialized_address = serialize(deserialized_address);
+        assert_eq!(serialized_address, serialized_str)
+    }
+
+    #[test]
+    fn wildcard_port() {
+        let wildcard = ":12345";
+        let serialized_str = serialize(Value::String(wildcard.to_owned()));
+        let deserialized_address = deserialize::<Address>(&serialized_str);
+        assert_eq!(
+            deserialized_address,
+            Address::Port(WildcardPort::new(12345))
+        )
+    }
+
+    #[test]
+    fn path_serializes_as_address_path() {
+        let path = "/var/run/st.sock";
+        let serialized_str = serialize(Value::String(path.into()));
+        let deserialized_address = deserialize::<Address>(&serialized_str);
+        assert_eq!(deserialized_address, Address::Path(path.into()))
+    }
 }
