@@ -85,10 +85,11 @@ mod test_helper {
     /// [`serde_json::Value`] and compare it with a directly [`serde_json::Value`] normalized
     /// representation.
     pub fn normalization_roundtrip_test<T: Serialize + for<'a> Deserialize<'a>>(json: &str) {
+        use serde_json::Value;
         let value: T = deserialize(json);
         let serialized = serialize(value);
-        let normalized: serde_json::Value = deserialize(&serialized);
-        let normalized_expected: serde_json::Value = deserialize(json);
+        let normalized: Value = deserialize(&serialized);
+        let normalized_expected: Value = deserialize(json);
         assert_eq!(normalized, normalized_expected)
     }
 }
