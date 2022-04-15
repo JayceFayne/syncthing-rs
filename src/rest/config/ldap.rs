@@ -35,7 +35,7 @@ pub struct Options {
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum Transport {
     /// Non secure connection.
-    NonTls,
+    Plain,
     /// TLS secured connection.
     Tls,
     /// StartTLS connection mode.
