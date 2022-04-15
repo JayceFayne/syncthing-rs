@@ -199,12 +199,12 @@ pub struct Device {
     ///
     /// [1]: <https://docs.syncthing.net/dev/device-ids.html#device-ids>
     #[serde(rename = "deviceID")]
-    id: String,
+    pub id: String,
     /// Defines which device has introduced us to this device. Used only for following
     /// de-introductions.
     // TODO: Is this a Device ID?
-    introduced_by: String,
-    encryption_password: String,
+    pub introduced_by: String,
+    pub encryption_password: String,
 }
 
 // TODO: Where is the documentation for this?

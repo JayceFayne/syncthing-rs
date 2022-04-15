@@ -4,12 +4,14 @@ pub mod folders;
 pub mod gui;
 pub mod ldap;
 pub mod options;
+pub mod restart_required;
 
 pub use devices::Device;
 pub use folders::Folder;
 pub use gui::Gui;
 pub use ldap::Ldap;
 pub use options::Options;
+pub use restart_required::RestartRequired;
 
 use serde::{Deserialize, Serialize};
 
@@ -50,7 +52,7 @@ pub enum DiskFreeUnit {
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Config {
-    pub version: u32,
+    pub version: Version,
     pub folders: Vec<Folder>,
     pub devices: Vec<Device>,
     pub gui: Gui,
@@ -60,6 +62,15 @@ pub struct Config {
     pub remote_ignored_devices: Vec<serde_json::Value>,
     pub defaults: Defaults,
 }
+
+/// This type is used for getting the version only from a full configuration.
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+pub struct VersionOnly {
+    pub version: Version,
+}
+
+/// The minimum supported version this API client got tested with.
+pub const MINIMUM_SUPPORTED_VERSION: Version = 36;
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
