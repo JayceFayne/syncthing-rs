@@ -2,6 +2,7 @@
 pub mod devices;
 pub mod folders;
 pub mod gui;
+pub mod ignores;
 pub mod ldap;
 pub mod options;
 pub mod restart_required;
@@ -9,6 +10,7 @@ pub mod restart_required;
 pub use devices::Device;
 pub use folders::Folder;
 pub use gui::Gui;
+pub use ignores::Ignores;
 pub use ldap::Ldap;
 pub use options::Options;
 pub use restart_required::RestartRequired;
