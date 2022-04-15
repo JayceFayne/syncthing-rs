@@ -23,11 +23,11 @@ pub struct Gui {
     /// This enables Profiling and additional endpoints in the REST API, see Debug Endpoints.
     pub debugging: bool,
     /// The listen address. Allowed address formats are:
-    /// - IPv4 address and port (127.0.0.1:8384)  
+    /// - IPv4 address and port (`127.0.0.1:8384`)  
     ///   The address and port are used as given.
-    /// - IPv6 address and port ([::1]:8384)  
+    /// - IPv6 address and port (`[::1]:8384`)  
     ///   The address and port are used as given. The address must be enclosed in square brackets.
-    /// - Wildcard and port (0.0.0.0:12345, [::]:12345, :12345)  
+    /// - Wildcard and port (`0.0.0.0:12345`, `[::]:12345`, `:12345`)  
     ///   These are equivalent and will result in Syncthing listening on all interfaces via both
     ///   IPv4 and IPv6.
     /// - UNIX socket location (/var/run/st.sock)  

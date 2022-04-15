@@ -1,7 +1,6 @@
-use super::{devices::Device, Count, FolderId, Kibibytes, MinDiskFree, Seconds};
+use super::{Count, FolderId, Kibibytes, MinDiskFree, Seconds};
 use serde::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// A counter with -1 meaning "infinite".
 pub type CountWithInfinite = i64;
@@ -19,35 +18,17 @@ pub struct Folder {
     // <https://udoprog.github.io/rust/2017-11-05/portability-concerns-with-path.html>
     // <https://www.reddit.com/r/rust/comments/ft30mm/why_pathbuffrom_str_can_never_fail/>
     pub path: PathBuf,
-    #[serde(flatten)]
-    pub options: Options,
-}
-
-impl Folder {
-    pub fn new(id: &str, path: &Path) -> Self {
-        Self {
-            id: id.to_owned(),
-            path: path.to_owned(),
-            options: Default::default(),
-        }
-    }
-}
-
-#[skip_serializing_none]
-#[derive(Clone, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
-pub struct Options {
     /// The label of a folder is a human readable and descriptive local name. May be different on
     /// each device, empty, and/or identical to other folder labels. (optional)
-    pub label: Option<String>,
+    pub label: String,
     /// The internal file system implementation used to access this folder, detailed in a [separate
     /// chapter][1].
     ///
     /// [1]: <https://docs.syncthing.net/advanced/folder-filesystem-type.html>
-    pub filesystem_type: Option<FilesystemType>,
+    pub filesystem_type: FilesystemType,
     /// Controls how the folder is handled by Syncthing.
     #[serde(rename = "type")]
-    pub ty: Option<Type>,
+    pub ty: Type,
     /// These must have the `id` attribute and can have an `introduced_by` attribute, identifying
     /// the device that introduced us to share this folder with the given device. If the original
     /// introducer unshares this folder with this device, our device will follow and unshare the
@@ -64,126 +45,126 @@ pub struct Options {
     /// [separate chapter][1].
     ///
     /// [1]: <https://docs.syncthing.net/users/untrusted.html>
-    pub devices: Option<Vec<Device>>,
+    pub devices: Vec<Device>,
     /// The rescan interval, in seconds. Can be set to `0` to disable when external plugins are used
     /// to trigger rescans.
-    pub rescan_interval_s: Option<Seconds>,
+    pub rescan_interval_s: Seconds,
     /// If set to `true`, this detects changes to files in the folder and scans them.
-    pub fs_watcher_enabled: Option<bool>,
+    pub fs_watcher_enabled: bool,
     /// The duration during which changes detected are accumulated, before a scan is scheduled (only
     /// takes effect if `fs_watcher_enabled` is set to `true`).
-    pub fs_watcher_delay_s: Option<Seconds>,
+    pub fs_watcher_delay_s: Seconds,
     /// If `true`, files originating from this folder will be announced to remote devices with the
     /// “no permission bits” flag. The remote devices will use whatever their default permission
     /// setting is when creating the files. The primary use case is for file systems that do not
     /// support permissions, such as FAT, or environments where changing permissions is impossible.
-    pub ignore_perms: Option<bool>,
+    pub ignore_perms: bool,
     /// Automatically correct UTF-8 normalization errors found in file names. The mechanism and how
     /// to set it up is described in a [separate chapter][1].
     ///
     /// [1]: <https://docs.syncthing.net/advanced/folder-autonormalize.html>
-    pub auto_normalize: Option<bool>,
+    pub auto_normalize: bool,
     /// The minimum required free space that should be available on the disk this folder resides.
     /// The folder will be stopped when the value drops below the threshold. The element content is
     /// interpreted according to the given unit attribute. Accepted unit values are `%` (percent of
     /// the disk / volume size), `kB`, `MB`, `GB` and `TB`. Set to zero to disable.
-    pub min_disk_free: Option<MinDiskFree>,
+    pub min_disk_free: MinDiskFree,
     /// Specifies a versioning configuration.
     ///
     /// See also [Versioning](<https://docs.syncthing.net/users/versioning.html>)
-    pub versioning: Option<Versioning>,
+    pub versioning: Versioning,
     /// The number of copier and hasher routines to use, or `0` for the system determined optimums.
     /// These are low-level performance options for advanced users only; do not change unless
     /// requested to or you’ve actually read and understood the code yourself. :)
-    pub copiers: Option<Count>,
-    pub hashers: Option<Count>,
+    pub copiers: Count,
+    pub hashers: Count,
     /// Controls when we stop sending requests to other devices once we’ve got this much unserved
     /// requests. The number of pullers is automatically adjusted based on this desired amount of
     /// outstanding request data.
     #[serde(rename = "pullerMaxPendingKiB")]
-    pub puller_max_pending_kib: Option<Kibibytes>,
+    pub puller_max_pending_kib: Kibibytes,
     /// The order in which needed files should be pulled from the cluster. It has no effect when the
     /// folder type is “send only”.
     ///
     /// Note that the scanned files are sent in batches and the sorting is applied only to the
     /// already discovered files. This means the sync might start with a 1 GB file even if there is
     /// 1 KB file available on the source device until the 1 KB becomes known to the pulling device.
-    pub order: Option<PullOrder>,
+    pub order: PullOrder,
     /// When set to `true`, this device will pretend not to see instructions to delete files from
     /// other devices. The mechanism is described in a [separate chapter][1].
     ///
     /// WARNING: Enabling this is highly discouraged - use at your own risk. You have been warned.
     ///
     /// [1]: https://docs.syncthing.net/advanced/folder-ignoredelete.html
-    pub ignore_delete: Option<bool>,
+    pub ignore_delete: bool,
     /// The interval in seconds with which scan progress information is sent to the GUI. Setting to
     /// `0` will cause Syncthing to use the default value of two.
-    pub scan_progress_interval_s: Option<Seconds>,
+    pub scan_progress_interval_s: Seconds,
     /// Tweak for rate limiting the puller when it retries pulling files. Don’t change this unless
     /// you know what you’re doing.
-    pub puller_pause_s: Option<Seconds>,
+    pub puller_pause_s: Seconds,
     /// The maximum number of conflict copies to keep around for any given file. The default, `-1`,
     /// means an unlimited number. Setting this to `0` disables conflict copies altogether.
-    pub max_conflicts: Option<CountWithInfinite>,
+    pub max_conflicts: CountWithInfinite,
     /// By default, blocks containing all zeros are not written, causing files to be sparse on
     /// filesystems that support this feature. When set to `true`, sparse files will not be created.
-    pub disable_sparse_files: Option<bool>,
+    pub disable_sparse_files: bool,
     /// By default, devices exchange information about blocks available in transfers that are still
     /// in progress, which allows other devices to download parts of files that are not yet fully
     /// downloaded on your own device, essentially making transfers more torrent like. When set to
     /// `true`, such information is not exchanged for this folder.
-    pub disable_temp_indexes: Option<bool>,
+    pub disable_temp_indexes: bool,
     /// `true` if this folder is (temporarily) suspended.
-    pub paused: Option<bool>,
+    pub paused: bool,
     /// Use weak hash if more than the given percentage of the file has changed. Set to `-1` to
     /// always use weak hash. Default is `25`.
-    pub weak_hash_threshold_pct: Option<CountWithInfinite>,
+    pub weak_hash_threshold_pct: CountWithInfinite,
     /// Name of a directory or file in the folder root to be used as [How do I serve a folder from a
     /// read only filesystem?][1]. Default is `.stfolder`.
     ///
     /// [1]: https://docs.syncthing.net/users/faq.html#marker-faq
-    pub marker_name: Option<String>,
+    pub marker_name: String,
     /// On Unix systems, tries to copy file/folder ownership from the parent directory (the
     /// directory it’s located in). Requires running Syncthing as a privileged user, or granting it
     /// additional capabilities (e.g. `CAP_CHOWN` on Linux).
-    pub copy_ownership_from_parent: Option<bool>,
+    pub copy_ownership_from_parent: bool,
     /// Allowed modification timestamp difference when comparing files for equivalence. To be used
     /// on file systems which have unstable modification timestamps that might change after being
     /// recorded during the last write operation. Default is `2` on Android when the folder is
     /// located on a FAT partition, and `0` otherwise.
-    pub mod_time_window_s: Option<Seconds>,
+    pub mod_time_window_s: Seconds,
     /// Maximum number of concurrent write operations while syncing. Increasing this might increase
     /// or decrease disk performance, depending on the underlying storage. Default is `2`.
-    pub max_concurrent_writes: Option<Count>,
+    pub max_concurrent_writes: Count,
     /// Disables committing file operations to disk before recording them in the database. Disabling
     /// fsync can lead to data corruption. The mechanism is described in a [separate chapter][1].
     ///
     /// WARNING: This is a known insecure option - use at your own risk.
     ///
     /// [1]: <https://docs.syncthing.net/advanced/folder-disable-fsync.html>
-    pub disable_fsync: Option<bool>,
+    pub disable_fsync: bool,
     /// Order in which the blocks of a file are downloaded. This option controls how quickly
     /// different parts of the file spread between the connected devices, at the cost of causing
     /// strain on the storage.
-    pub block_pull_order: Option<BlockPullOrder>,
+    pub block_pull_order: BlockPullOrder,
     /// Provides a choice of method for copying data between files. This can be used to optimize
     /// copies on network filesystems, improve speed of large copies or clone the data using
     /// copy-on-write functionality if the underlying filesystem supports it. The mechanism is
     /// described in a [separate chapter][1].
     ///
     /// [1]: <https://docs.syncthing.net/advanced/folder-copyrangemethod.html>
-    pub copy_range_method: Option<CopyRangeMethod>,
+    pub copy_range_method: CopyRangeMethod,
     /// Affects performance by disabling the extra safety checks for case insensitive filesystems.
     /// The mechanism and how to set it up is described in a [separate chapter][1].
     ///
     /// [1]: <https://docs.syncthing.net/advanced/folder-casesensitivefs>
     #[serde(rename = "caseSensitiveFS")]
-    pub case_sensitive_fs: Option<bool>,
+    pub case_sensitive_fs: bool,
     /// NTFS directory junctions are treated as ordinary directories, if this is set to `true`.
-    pub junctions_as_dirs: Option<bool>,
+    pub junctions_as_dirs: bool,
 }
 
-/// https://docs.syncthing.net/advanced/folder-filesystem-type.html
+/// <https://docs.syncthing.net/advanced/folder-filesystem-type.html>
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum FilesystemType {
@@ -211,18 +192,32 @@ pub enum Type {
     ReceiveEncrypted,
 }
 
-// TODO: Where is the spec for this?
-#[skip_serializing_none]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
+pub struct Device {
+    /// The [device ID][1].
+    ///
+    /// [1]: <https://docs.syncthing.net/dev/device-ids.html#device-ids>
+    #[serde(rename = "deviceID")]
+    id: String,
+    /// Defines which device has introduced us to this device. Used only for following
+    /// de-introductions.
+    // TODO: Is this a Device ID?
+    introduced_by: String,
+    encryption_password: String,
+}
+
+// TODO: Where is the documentation for this?
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Versioning {
     #[serde(rename = "type")]
-    pub ty: Option<String>,
+    pub ty: String,
     // TODO
-    pub params: Option<serde_json::Value>,
-    pub cleanup_interval_s: Option<Seconds>,
-    pub fs_path: Option<String>,
-    pub fs_type: Option<FilesystemType>,
+    pub params: serde_json::Value,
+    pub cleanup_interval_s: Seconds,
+    pub fs_path: String,
+    pub fs_type: FilesystemType,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
@@ -284,19 +279,6 @@ pub enum CopyRangeMethod {
 mod tests {
     use super::*;
     use crate::rest::config::test_helper::*;
-
-    #[test]
-    fn can_deserialize_folder_with_id_and_path_only() {
-        assert_eq!(
-            deserialize::<Folder>(r#"{"id": "folder_id", "path": "folder_path"}"#),
-            Folder::new("folder_id", Path::new("folder_path"))
-        );
-
-        assert_eq!(
-            serialize(Folder::new("folder_id", Path::new("folder_path"))),
-            r#"{"id":"folder_id","path":"folder_path"}"#
-        )
-    }
 
     #[test]
     fn copy_range_method_naming() {

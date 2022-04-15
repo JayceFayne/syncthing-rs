@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
 
 /// LDAP configuration options. The mechanism is described in detail under LDAP Authentication.
 /// <https://docs.syncthing.net/users/config.html#ldap-element>
@@ -17,18 +16,17 @@ pub struct Ldap {
     pub options: Options,
 }
 
-#[skip_serializing_none]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
 pub struct Options {
-    pub transport: Option<Transport>,
+    pub transport: Transport,
     /// Skip verification (`true` or `false`).
-    pub insecure_skip_verify: Option<bool>,
+    pub insecure_skip_verify: bool,
     /// Base DN for user searches.
     #[serde(rename = "searchBaseDN")]
-    pub search_base_dn: Option<String>,
+    pub search_base_dn: String,
     /// Search filter for user searches.
-    pub search_filter: Option<String>,
+    pub search_filter: String,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
