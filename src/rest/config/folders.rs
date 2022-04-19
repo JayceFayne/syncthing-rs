@@ -1,4 +1,5 @@
 use super::{Count, FolderId, Kibibytes, MinDiskFree, Seconds};
+use crate::utils::impl_from_str_and_display;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -172,6 +173,8 @@ pub enum FilesystemType {
     Fake,
 }
 
+impl_from_str_and_display!(FilesystemType);
+
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum Type {
@@ -191,6 +194,8 @@ pub enum Type {
     /// [1]: <https://docs.syncthing.net/users/untrusted.html>
     ReceiveEncrypted,
 }
+
+impl_from_str_and_display!(Type);
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase", deserialize = "camelCase"))]
@@ -236,6 +241,8 @@ pub enum PullOrder {
     NewestFirst,
 }
 
+impl_from_str_and_display!(PullOrder);
+
 impl Default for PullOrder {
     fn default() -> Self {
         Self::Random
@@ -258,6 +265,8 @@ pub enum BlockPullOrder {
     InOrder,
 }
 
+impl_from_str_and_display!(BlockPullOrder);
+
 impl Default for BlockPullOrder {
     fn default() -> Self {
         Self::Standard
@@ -274,6 +283,8 @@ pub enum CopyRangeMethod {
     DuplicateExtents,
     All,
 }
+
+impl_from_str_and_display!(CopyRangeMethod);
 
 #[cfg(test)]
 mod tests {

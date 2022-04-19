@@ -1,3 +1,5 @@
+use super::PortNumber;
+use crate::utils::impl_from_str_and_display;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Write},
@@ -6,8 +8,6 @@ use std::{
     path::PathBuf,
     str::FromStr,
 };
-
-use super::PortNumber;
 
 /// The GUI configuration.
 /// <https://docs.syncthing.net/users/config.html#gui-element>
@@ -68,6 +68,8 @@ pub enum Address {
     Port(WildcardPort),
     Path(PathBuf),
 }
+
+impl_from_str_and_display!(Address);
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct WildcardPort(PortNumber);
@@ -137,6 +139,8 @@ pub enum AuthMode {
     Static,
     Ldap,
 }
+
+impl_from_str_and_display!(AuthMode);
 
 #[cfg(test)]
 mod tests {

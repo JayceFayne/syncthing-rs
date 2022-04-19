@@ -1,6 +1,7 @@
 use super::{
     Count, Hours, Kibibytes, KibibytesPerSecond, MinDiskFree, Minutes, PortNumber, Seconds,
 };
+use crate::utils::impl_from_str_and_display;
 use ipnet::IpNet;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -194,6 +195,8 @@ pub enum ListenAddress {
     Address(Url),
 }
 
+impl_from_str_and_display!(ListenAddress);
+
 /// A URI to a global announce (discovery) server, or the word default to include the default
 /// servers. The syntax for non-default entries is that of an HTTP or HTTPS URL. A number of options
 /// may be added as query options to the URL: `insecure` to prevent certificate validation (required
@@ -207,6 +210,8 @@ pub enum AnnounceServer {
     Address(Url),
 }
 
+impl_from_str_and_display!(AnnounceServer);
+
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum StunServer {
@@ -216,6 +221,8 @@ pub enum StunServer {
     Address(String),
 }
 
+impl_from_str_and_display!(StunServer);
+
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum DatabaseTuning {
@@ -223,6 +230,8 @@ pub enum DatabaseTuning {
     Large,
     Auto,
 }
+
+impl_from_str_and_display!(DatabaseTuning);
 
 mod strings {
     use crate::utils::named_unit_variant;

@@ -63,5 +63,25 @@ macro_rules! named_unit_variant {
         }
     };
 }
-
 pub(crate) use named_unit_variant;
+
+/// Implements `FromStr` and `Display` in terms of `Serialize` and `Deserialize` implementations.
+macro_rules! impl_from_str_and_display {
+    ($ty:ty) => {
+        impl std::str::FromStr for $ty {
+            type Err = serde_json::Error;
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                serde_json::from_value(serde_json::Value::String(s.into()))
+            }
+        }
+
+        impl std::fmt::Display for $ty {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let v = serde_json::to_value(&self).map_err(|_| std::fmt::Error)?;
+                v.as_str().ok_or(std::fmt::Error)?.fmt(f)
+            }
+        }
+    };
+}
+
+pub(crate) use impl_from_str_and_display;

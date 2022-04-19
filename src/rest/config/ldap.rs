@@ -1,3 +1,4 @@
+use crate::utils::impl_from_str_and_display;
 use serde::{Deserialize, Serialize};
 
 /// LDAP configuration options. The mechanism is described in detail under LDAP Authentication.
@@ -39,3 +40,5 @@ pub enum Transport {
     /// StartTLS connection mode.
     StartTls,
 }
+
+impl_from_str_and_display!(Transport);

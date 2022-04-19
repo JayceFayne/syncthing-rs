@@ -1,4 +1,5 @@
 use super::{FolderId, Kibibytes, KibibytesPerSecond, PortNumber};
+use crate::utils::impl_from_str_and_display;
 use ipnet::IpNet;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -96,6 +97,8 @@ pub enum Compression {
     Never,
 }
 
+impl_from_str_and_display!(Compression);
+
 impl Default for Compression {
     fn default() -> Self {
         Self::Metadata
@@ -109,6 +112,8 @@ pub enum Address {
     Dynamic,
     Static(Url),
 }
+
+impl_from_str_and_display!(Address);
 
 mod strings {
     use crate::utils::named_unit_variant;
@@ -189,4 +194,11 @@ mod tests {
         "untrusted": false,
         "remoteGUIPort": 0
     }"#;
+
+    #[test]
+    fn address_from_str_to_display() {
+        let addr_str = "tcp://host:22000";
+        let addr: Address = addr_str.parse().unwrap();
+        assert_eq!(addr.to_string(), addr_str);
+    }
 }
