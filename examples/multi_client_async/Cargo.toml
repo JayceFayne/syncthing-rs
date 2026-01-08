@@ -1,0 +1,9 @@
+[package]
+name = "multi_client_async"
+version = "1.0.0"
+authors = ["Dylan Sandall <dsandalledu@gmail.com>"]
+edition = "2024"
+
+[dependencies]
+syncthing-async = { path = "../../async" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

@@ -7,12 +7,13 @@ use reqwest::Client as HttpClient;
 use serde::Serialize;
 use serde::de::DeserializeOwned as Deserialize;
 use std::collections::HashMap;
+use syncthing_types::FolderID;
 use syncthing_types::events::{Event, EventType};
 use syncthing_types::utils::construct_uri;
 use syncthing_types::{API_DEFAULT_AUTHORITY, Timestamp};
 use syncthing_types::{API_HEADER_KEY, routes::*};
 use syncthing_types::{EMPTY_EVENT_SUBSCRIPTION, system};
-use syncthing_types::{cluster, utils};
+use syncthing_types::{cluster, config, db, utils};
 
 pub struct Client {
     client: HttpClient,
@@ -35,6 +36,10 @@ impl Client {
             authority,
             api_key: api_key.into(),
         }
+    }
+
+    pub fn authority(&self) -> &Authority {
+        &self.authority
     }
 
     pub(crate) async fn get<D: Deserialize, T: AsRef<[u8]> + 'static>(
@@ -155,5 +160,19 @@ impl Client {
 
     pub async fn get_cluster_pending_devices(&self) -> Fallible<cluster::PendingDevices> {
         self.get(CLUSTER_PENDING_DEVICES).await
+    }
+
+    pub async fn get_config_folders(&self) -> Fallible<Vec<config::Folder>> {
+        self.get(CONFIG_FOLDERS).await
+    }
+
+    pub async fn get_config_devices(&self) -> Fallible<Vec<config::Device>> {
+        self.get(CONFIG_DEVICES).await
+    }
+
+    pub async fn get_db_status(&self, folder_id: &FolderID) -> Fallible<db::Status> {
+        let mut string: String = DB_STATUS.to_string();
+        string.push_str(folder_id);
+        self.get(string).await
     }
 }

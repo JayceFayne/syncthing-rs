@@ -6,4 +6,6 @@ members = [
     "blocking",
     "examples/event_printer",
     "examples/system_info",
+    "examples/multi_client",
+    "examples/multi_client_async",
 ]

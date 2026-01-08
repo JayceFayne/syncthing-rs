@@ -1,0 +1,8 @@
+[package]
+name = "multi_client"
+version = "1.0.0"
+authors = ["Dylan Sandall <dsandalledu@gmail.com>"]
+edition = "2024"
+
+[dependencies]
+syncthing = { path = "../../blocking/" }

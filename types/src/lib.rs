@@ -1,4 +1,6 @@
 pub mod cluster;
+pub mod config;
+pub mod db;
 pub mod events;
 pub mod routes;
 pub mod system;
@@ -20,6 +22,7 @@ pub static EMPTY_EVENT_SUBSCRIPTION: Vec<crate::events::EventType> = Vec::new();
 type FileName = String;
 //TODO: use separate type?
 type DeviceID = String;
+pub type FolderID = String;
 type FolderName = String;
 type Folder = HashMap<FileName, File>;
 pub type Timestamp = DateTime<FixedOffset>;
